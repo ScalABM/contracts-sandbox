@@ -15,5 +15,9 @@ limitations under the License.
 */
 package settlement
 
+import akka.actor.Actor
 
-trait CentralCounterpartyMechanism extends SettlementMechanismLike
+
+trait CounterpartyLike {
+  this: Actor =>
+}
