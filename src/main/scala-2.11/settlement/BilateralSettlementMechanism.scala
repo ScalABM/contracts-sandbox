@@ -21,8 +21,8 @@ import akka.actor.Actor
 class BilateralSettlementMechanism extends Actor with SettlementMechanismLike {
 
   def receive: Receive = {
-    case contract: ContractLike =>
-      context.actorOf(ContractHandler.props(contract))
+    case fill: ContractLike =>
+      context.actorOf(ContractHandler.props(fill))
   }
 
 }

@@ -13,9 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import akka.actor.ActorRef
 
 
+/** Package for modeling settlement processes.
+  *
+  * @todo Move this entire package into a separate lower level library/API.
+  */
 package object settlement {
 
   /** Base trait for all messages. */
@@ -27,14 +30,40 @@ package object settlement {
 
 
   /** Base trait for representing contracts. */
-  trait ContractLike extends MessageLike {
+  trait ContractLike extends MessageLike
 
-    /** The actor for whom the `ContractLike` is a liability. */
-    def issuer: ActorRef
 
-    /** The actor for whom the `ContractLike` is an asset. */
-    def counterparty: Option[ActorRef]
+  case class AssetsRequest(asset: AssetLike, quantity: Double) {
+
+    require(quantity > 0.0)
 
   }
+
+
+  case class Assets(instrument: AssetLike, quantity: Double) {
+
+    require(quantity > 0.0)
+
+  }
+
+
+  case class Payment(amount: Double) {
+
+    require(amount > 0.0)
+
+  }
+
+
+  case class PaymentRequest(amount: Double) {
+
+    require(amount > 0.0)
+
+  }
+
+
+  case class InsufficientFundsException(message: String) extends Exception(message)
+
+
+  case class InsufficientAssetsException(message: String) extends Exception(message)
 
 }
