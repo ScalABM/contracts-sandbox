@@ -13,7 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets
+import akka.actor.ActorRef
 
 
-package object settlement
+package object settlement {
+
+  /** Base trait for all messages. */
+  trait MessageLike {
+
+    val timestamp: Long
+
+  }
+
+
+  /** Base trait for representing contracts. */
+  trait ContractLike extends MessageLike {
+
+    /** The actor for whom the `ContractLike` is a liability. */
+    def issuer: ActorRef
+
+    /** The actor for whom the `ContractLike` is an asset. */
+    def counterparty: Option[ActorRef]
+
+  }
+
+}

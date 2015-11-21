@@ -13,14 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package markets.settlement
+package settlement
 
 import akka.actor.{Props, Actor}
 
-import markets.orders.filled.FilledOrderLike
 
-
-class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
+class ContractHandler(contract: ContractLike) extends Actor {
 
   def receive: Receive = {
     ???
@@ -31,8 +29,8 @@ class ContractHandler(filledOrder: FilledOrderLike) extends Actor {
 
 object ContractHandler {
 
-  def props(fill: FilledOrderLike): Props = {
-    Props(new ContractHandler(fill))
+  def props(contract: ContractLike): Props = {
+    Props(new ContractHandler(contract))
   }
 
 }
