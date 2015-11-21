@@ -44,3 +44,19 @@ Quick list of current requirements for a `ContractActor`:
 * a `ContractActor` should be able to value its `Commitment`.
 
 Conceptually, a `ContractActor` represents a channel for communication between the issuer and the counterparty to the underlying `Commitment`.
+
+### Settlement mechanisms
+Fundamental objective of a `SettlementMechanismActor` is to convert filled orders into settled transactions. Rough sketch of a process by which filled orders are converted into settled transaction is as follows.
+
+1. Receive filled orders from some ClearingMechanismLike actor(s).
+2. Send request for the desired quantity of the specified Tradable to the seller. 
+3. Send request for some desired quantity of the specified means of payment (which will be some other Tradable) to the buyer.
+4. Handle response from the seller (requires handling the case in which seller has insufficient quantity of the specified Tradable).
+5. Handle response from the buyer (requires handling the case in which buyer has insufficient quantity of the specified means of payment).
+6. Generate a settled transaction.
+
+The following two types of settlement mechanisms should cover most all possible use cases.
+
+* `BilateralSettlement`: with `BilateralSettlement`, buy and sell counterparties settle directly with one another.
+* `CentralCounterpartySettlement`: With `CentralCounterparty` settlement, a central counterparty (CCP) actor inserts itself as a both a buy and sell counterparty to all filled orders that it receives from some clearing mechanism. After inserting itself as a counterparty, the CCP actor then settles the filled orders using bilateral settlement mechanism. Unlike clearing mechanisms, which are unique to a particular market, settlement mechanisms could be shared across markets.
+
