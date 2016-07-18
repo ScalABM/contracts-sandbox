@@ -10,13 +10,13 @@ import BalanceSheet.Exceptions._
  * within a BalanceSheet can potentially represent either physical Goods 
  * or Contracts. 
  */
-abstract class BalanceSheet {
+class BalanceSheet {
   
   /**
    * Collection of all the Items on the balance sheet
    * These are a collection of assets and liabilities
    */
-  val items = scala.collection.mutable.HashSet[Item]()
+  val items = scala.collection.mutable.Set[Item]()
     
   /**
    * Adds an Item to the BalanceSheet. This method is 
@@ -25,7 +25,7 @@ abstract class BalanceSheet {
    * @return returns a boolean regarding whether the add was successful.
    */
   protected def add(item: Item): Boolean = {
-    items.add(item)
+   items.add(item)
   }
   
   /** 
@@ -50,14 +50,14 @@ abstract class BalanceSheet {
 	 * @param amount the amount of money to remove from the BalanceSheet
 	 */
   @throws(classOf[LiquidityException])
-	protected def dishoard(amount: Double): Unit
+	protected def dishoard(amount: Double): Unit = {}
   //@TODO implement dishoard
 	
 	/**
 	 * Adds some "amount" of cash to the balancesheet
 	 * @param amount the amount of money added to the BalanceSheet
 	 */
-  protected def hoard(amount: Double): Unit
+  protected def hoard(amount: Double): Unit = {}
 	//@TODO implement hoard
   
   // Method used to decrement the commitment on a particular financial liability.
@@ -71,24 +71,23 @@ abstract class BalanceSheet {
   
   /**
    * Transfer some quantity of a Good off the balance sheet.
-   * @param good The type of Good to remove
-   * @param quantity The amount of Good to remove
+   * @param good The type of good and quantity to remove
    */
   @throws(classOf[AssetQuantityException])
   @throws(classOf[IllegalArgumentException])
-  protected def expend(good: GoodType, quantity: Double): Unit = {
-    
+  def expend(good: Good): Unit = {
+      
     //Quantity must be greater than zero
-    if (quantity <= 0.0) {
+    if (good.quantity <= 0.0) {
       throw new IllegalArgumentException("Cannot remove a quantity less than or equal to zero")
     }
     
     //Finds all the goods with 'good' as the GoodType
-    val filtered = this.goods().filter { g:Good => g.Goodtype.getUUID() == good.getUUID() }
+    val filtered = this.goods().filter { g:Good => g.goodType.getUUID() == good.goodType.getUUID()}
     
     //If the requested good does not appear on the balance sheet, throw an error.
     if (filtered.isEmpty) {
-      throw new AssetQuantityException("A good of type: " + good.getName() + 
+      throw new AssetQuantityException("A good of type: " + good.goodType.getName() + 
           " does not exist on the balance sheet")
       
     //A balancesheet should only contain one instance of a Good with a particular GoodType 
@@ -97,44 +96,41 @@ abstract class BalanceSheet {
           " This is a serious exception, as the integrity of BalanceSheet may be comprised.")  
     }
     
-    if (filtered.head.quantity < quantity) {
+    if (filtered.head.quantity < good.quantity) {
       throw new AssetQuantityException("This BalanceSheet only contains " + filtered.head.quantity +
-          " of Good: " + good.getName() + ". Thus, it is impossible to expend " + quantity +
+          " of Good: " + good.goodType.getName() + ". Thus, it is impossible to expend " + good.quantity +
           " of the good.")
     }
-    
-    filtered.head.quantity = filtered.head.quantity - quantity
-    
+ 
+    filtered.head.quantity = filtered.head.quantity - good.quantity
   }
   
   /**
    * Method used to increment the amount of a particular Good. 
-   * @param good The goodType to increment
-   * @param quantity The amount of Good to add
+   * @param good the type of good and quantity to add.
    */
   @throws(classOf[IllegalArgumentException])
-  protected def receive(good: GoodType, quantity: Double): Unit = {
+  def receive(good: Good): Unit = {
     
     //Quantity must be greater than zero
-    if (quantity <= 0.0) {
+    if (good.quantity <= 0.0) {
       throw new IllegalArgumentException("Cannot add a quantity less than or equal to zero")
     }
-    
-    //Finds all the goods with 'good' as the GoodType
-    val filtered = this.goods().filter { g:Good => g.Goodtype.getUUID() == good.getUUID() }
-    
+ 
+    //Finds all the goods with the same GoodType as good
+    val filtered = this.goods().filter { g:Good => g.goodType.getUUID() == good.goodType.getUUID() }
+ 
     //If the requested good does not appear on the balance sheet, add it.
     if (filtered.isEmpty) {
-      val g:Good = new Good(good, quantity)
-      this.add(g)
-      
+      this.add(good)
+ 
     //A balancesheet should only contain one instance of a Good with a particular GoodType 
     } else if (filtered.size > 1) {
       throw new IllegalStateException("Two different GoodTypes with the same UUID were found." + 
           " This is a serious exception, as the integrity of BalanceSheet may be comprised.")  
     //add to the quantity of the existing good
     } else {
-      filtered.head.quantity = filtered.head.quantity + quantity
+      filtered.head.quantity = filtered.head.quantity + good.quantity
     }
   }
   
@@ -150,12 +146,21 @@ abstract class BalanceSheet {
 	  items.filter(p)
 	}
 
+  
+  /**
+   * Returns all the Items in the BalanceSheet
+   * @return an iterable collection of items
+   */
+  def getAll(): Iterable[Item] = {
+    filter((i:Item) => true)
+  }
+  
   /**
    * Pulls all the assets from a balancesheet
    * @return Iterable list of Items comprised of all the 
    * assets on the balancesheet. 
    */
-  def assets(): Iterable[Item]
+  def assets(): Iterable[Item] = {return null}
     //@TODO implement assets 
   
   /**
@@ -163,7 +168,7 @@ abstract class BalanceSheet {
    * @return an Iterable list of items comprised of the
    * liabilities on the balancesheet
    */
-  def liabilities(): Iterable[Item]
+  def liabilities(): Iterable[Item] = {return null}
     //@TODO implement liabilities
     //tradables.filter(some function to search for liabilities)
 
@@ -221,7 +226,7 @@ abstract class BalanceSheet {
 	 * @param The function used to value each Item in the balance sheet
 	 * @return assets - liabilities, given f.
 	 */
-  def equity(f: Item => Double): Double
+  def equity(f: Item => Double): Double = { -1.0}
   //@TODO implement equity
   
 }
