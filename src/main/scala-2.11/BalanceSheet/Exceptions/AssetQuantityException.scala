@@ -1,4 +1,4 @@
-package BalanceSheet
+package BalanceSheet.Exceptions
 
 /**
  * Exception is thrown when a BalanceSheet does not possess enough
